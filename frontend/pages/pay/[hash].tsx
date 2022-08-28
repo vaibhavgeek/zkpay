@@ -83,7 +83,7 @@ const Pay = () => {
       // console.log(encryptedNote);
       // console.log(accountAddress);
      // const bytesAddress = ethers.utils.formatBytes32String(account as any);
-     const rawCommitment = BigNumber.from("0x" + base64url.decode(hash as string));
+      const rawCommitment = BigNumber.from("0x" + base64url.decode(hash as string));
       const transaction = await ZKPayLink.deposit(rawCommitment);
       await transaction.wait(1);
     // } finally {
