@@ -6,13 +6,13 @@ import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { MerkleTree } from "fixed-merkle-tree";
 import { generateProof } from "./utils/proof";
 import { populateEvents } from "./utils/events";
-import { LocalStoredEvent } from "./utils/storage";
 import { decodeNote } from "./utils/note";
 import { BigNumber, ethers } from "ethers";
 import {constants} from "./utils/address";
 import { CONTRACT_TO_ABI } from "./utils/contracts";
 import { PoseidonHasher } from "./utils/hasher";
 const buildPoseidon = require("circomlibjs").buildPoseidon;
+import { LocalStoredEvent } from "./utils/storage";
 
 const hasher = new PoseidonHasher(await buildPoseidon());
 
@@ -31,8 +31,8 @@ export default function Redeem() {
   useEffect(() => {
     if(chainId !== null){
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-    const ZKPayLink = new ethers.Contract(constants.auroraDev.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
-    const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
+    const ZKPayLink = new ethers.Contract(constants.polygonMumbai.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
+    const ZKPayToken = new ethers.Contract(constants.polygonMumbai.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
     
 
     setEventsLoading(true);
@@ -49,8 +49,8 @@ export default function Redeem() {
       return;
     }
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-    const ZKPayLink = new ethers.Contract(constants.auroraDev.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
-    const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
+    const ZKPayLink = new ethers.Contract(constants.polygonMumbai.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
+    const ZKPayToken = new ethers.Contract(constants.polygonMumbai.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
 
 
     setRedeemLoading(true);
@@ -79,8 +79,8 @@ export default function Redeem() {
 
   const redeem = async () => {
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-    const ZKPayLink = new ethers.Contract(constants.auroraDev.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
-    const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
+    const ZKPayLink = new ethers.Contract(constants.polygonMumbai.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
+    const ZKPayToken = new ethers.Contract(constants.polygonMumbai.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
 
 
 

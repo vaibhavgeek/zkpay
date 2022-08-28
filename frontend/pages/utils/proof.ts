@@ -2,7 +2,7 @@ import { BigNumberish } from "ethers";
 // @ts-ignore
 import { groth16 } from "snarkjs";
 // @ts-ignore
-import { utils } from "ffjavascript";
+import  {utils } from "ffjavascript";
 
 export type Input = {
   recipient: string,

@@ -20,14 +20,14 @@ const Pay = () => {
 
   const [payLoading, setPayLoading] = useState<boolean>();
   const [payed, setPayed] = useState<boolean>();
-
+  const chainName = "polygonMumbai";
   const [payedPreviously, setPayedPreviously] = useState<boolean>();
   console.log("ethereum", ethereum);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-    const ZKPayLink = new ethers.Contract(constants.auroraDev.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
-    const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
+    const ZKPayLink = new ethers.Contract(constants[chainName].ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
+    const ZKPayToken = new ethers.Contract(constants[chainName].ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
   
       provider.getSigner(0)
         .getAddress()
@@ -57,8 +57,8 @@ const Pay = () => {
 
   const approveToken = async () => {
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-    const ZKPayLink = new ethers.Contract(constants.auroraDev.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
-    const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
+    const ZKPayLink = new ethers.Contract(constants[chainName].ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
+    const ZKPayToken = new ethers.Contract(constants[chainName].ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
   
     setApproveLoading(true);
     try {
@@ -73,18 +73,18 @@ const Pay = () => {
 
   const payCommitment = async () => {
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-    const ZKPayLink = new ethers.Contract(constants.auroraDev.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
-    const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
+    const ZKPayLink = new ethers.Contract(constants[chainName].ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
+    const ZKPayToken = new ethers.Contract(constants[chainName].ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
   
     setPayLoading(true);
     // try {
-      // const encryptedNote = randomBN(32).toHexString();
-      // const accountAddress = randomBN(32).toHexString();
+      const encryptedNote = randomBN(32).toHexString();
+      const accountAddress = randomBN(32).toHexString();
       // console.log(encryptedNote);
       // console.log(accountAddress);
      // const bytesAddress = ethers.utils.formatBytes32String(account as any);
       const rawCommitment = BigNumber.from("0x" + base64url.decode(hash as string));
-      const transaction = await ZKPayLink.deposit(rawCommitment);
+      const transaction = await ZKPayLink.deposit(accountAddress, encryptedNote, rawCommitment);
       await transaction.wait(1);
     // } finally {
     //   setPayLoading(false);

@@ -3,7 +3,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { DepositEvent } from "../../../artifacts/contracts/types/contracts/ZKPayLink";
 import { getEvents, getLastBlock, LocalStoredEvent, saveEvents, saveLastBlock } from "./storage";
 
-export const populateEvents = async (ZKPayLink: ZKPayLink, chainId: string, provider: Web3Provider) => {
+export const populateEvents = async (ZKPayLink: any, chainId: string, provider: Web3Provider) => {
   const events = getEvents(chainId);
   const lastBlock = getLastBlock(chainId);
 
