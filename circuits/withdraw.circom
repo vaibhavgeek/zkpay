@@ -30,12 +30,13 @@ template Withdraw(levels) {
 
     component merkleProof = MerkleProof(levels);
     merkleProof.leaf <== commitmentHasher.out;
-    //component pathNumber = Bits2Num(levels);
+    
+    component pathNumber = Bits2Num(levels);
     for (var i = 0; i < levels; i++) {
          merkleProof.pathElements[i] <== pathElements[i];
          merkleProof.pathIndices[i] <== pathIndices[i];
 
-         //pathNumber.in[i] <== pathIndices[i];
+         pathNumber.in[i] <== pathIndices[i];
     }
 
     merkleProof.root === root;
@@ -46,6 +47,7 @@ template Withdraw(levels) {
 
     nullifierHash <== nullifierHasher.out;
 
+    // Squares are used to prevent optimizer from removing those constraints
     signal recipientSquare;
     recipientSquare <== recipient * recipient;
 }

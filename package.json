@@ -1,6 +1,6 @@
 {
   "name": "zkpay",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "circuit:build": "hardhat circom --verbose",
@@ -16,9 +16,13 @@
     "@typechain/hardhat": "^6.0.0",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
     "chai": "^4.3.6",
     "circomlib": "^2.0.3",
     "circomlibjs": "^0.1.2",
+    "eslint": "^8.23.0",
+    "eslint-plugin-react": "^7.31.1",
     "ethereum-waffle": "^3.4.4",
     "ffjavascript": "^0.2.52",
     "fixed-merkle-tree": "^0.7.3",
@@ -33,6 +37,8 @@
   },
   "dependencies": {
     "@metamask/eth-sig-util": "^4.0.1",
-    "dotenv": "^16.0.0"
+    "@types/fs-extra": "^9.0.13",
+    "dotenv": "^16.0.0",
+    "fs-extra": "^10.1.0"
   }
 }

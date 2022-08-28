@@ -1,45 +1,66 @@
 import "@typechain/hardhat"
 import "@nomiclabs/hardhat-ethers"
 import hre, { ethers } from "hardhat";
-import fs from "fs";
-import { deployToken } from "./deployToken";
-import { deployVerifier } from "./deployVerifier";
-import { deployHasher } from "./deployHasher";
+import fs from "fs-extra";
+
+
+const deployContractGeneric = async (name: string, network:string) => {
+  const contractBase = await ethers.getContractFactory(name);
+  console.log("get Contract Factory?");
+  const deployedContract = await contractBase.deploy();
+  console.log(`${name} Contract Deployed at: `, deployedContract.address);
+
+  const addressesJson = `./scripts/contractAddresses/${network}.json`;
+  const addressData = await fs.readJSON(addressesJson);
+  console.log("address data", addressData);
+  addressData[name] = deployedContract.address;
+  await fs.writeJson(addressesJson, addressData);
+}
+const checkIfDeployed = async (name: string, network: string) => {
+  const addressesJson = `./scripts/contractAddresses/${network}.json`;
+  console.log("addressJSON PATH", addressesJson);
+  const addressData = await fs.readJSON(addressesJson);
+  console.log("address data", addressData);
+  if(addressData.hasOwnProperty(name)){
+      console.log("eureka");
+      return true;
+  }
+  else{
+    console.log("Expected result");
+    return false;
+  }
+}
 
 const deploy = async () => {
-  console.log("network name", hre.network.name);
-  const outDir = `./scripts/out/${hre.network.name}/`;
-
-  if (!fs.existsSync) {
-    fs.mkdirSync(outDir);
+  console.log("network name : ", hre.network.name);
+  
+  if (!(await checkIfDeployed("ZKPayToken", hre.network.name))) {
+    console.log("deploy contract token", "ZKPayToken");
+    await deployContractGeneric("ZKPayToken", hre.network.name)
   }
-
-  const tokenPath = `${outDir}token.address`;
-  if (!fs.existsSync(tokenPath)) {
-    await deployToken(tokenPath);
+  else {
+    console.log("already exists, ZKPayToken");
   }
-
-  const verifierPath = `${outDir}verifier.address`;
-  if (!fs.existsSync(verifierPath)) {
-    await deployVerifier(verifierPath);
+  if (!(await checkIfDeployed("Verifier", hre.network.name))) {
+    await deployContractGeneric("Verifier", hre.network.name)
   }
-
-  const hasherPath = `${outDir}hasher.address`;
-  if (!fs.existsSync(hasherPath)) {
-    await deployHasher(hasherPath);
+  if (!(await checkIfDeployed("PoseidonHasher", hre.network.name))) {
+    await deployContractGeneric("PoseidonHasher", hre.network.name)
   }
 
   const amount = ethers.utils.parseEther("1");
-
-  const tokenAddress = fs.readFileSync(tokenPath, "utf8");
-  const verifierAddress = fs.readFileSync(verifierPath, "utf8");
-  const hasherAddress = fs.readFileSync(hasherPath, "utf8");
+  const addressesJson = `./scripts/contractAddresses/${hre.network.name}.json`;
+  
+  const addressData = await fs.readJSON(addressesJson);
+  const tokenAddress = addressData["ZKPayToken"];
+  const verifierAddress = addressData["Verifier"];
+  const hasherAddress = addressData["PoseidonHasher"];
 
   const ZKPayLink = await ethers.getContractFactory("ZKPayLink");
   const payLink = await ZKPayLink.deploy(tokenAddress, amount, verifierAddress, 10, hasherAddress);
   console.log("PayLink deployed to:", payLink.address);
-
-  fs.writeFileSync(`${outDir}payLink.address`, payLink.address);
+  addressData["ZKPayLink"] = payLink.address;
+  await fs.writeJson(addressesJson, addressData);
 }
 
 deploy()
