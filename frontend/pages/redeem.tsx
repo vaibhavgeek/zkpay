@@ -13,6 +13,7 @@ import { CONTRACT_TO_ABI } from "./utils/contracts";
 import { PoseidonHasher } from "./utils/hasher";
 const buildPoseidon = require("circomlibjs").buildPoseidon;
 import { LocalStoredEvent } from "./utils/storage";
+import TextField from '@mui/material/TextField';
 
 const hasher = new PoseidonHasher(await buildPoseidon());
 
@@ -52,14 +53,13 @@ export default function Redeem() {
     const ZKPayLink = new ethers.Contract(constants.polygonMumbai.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
     const ZKPayToken = new ethers.Contract(constants.polygonMumbai.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
 
-
     setRedeemLoading(true);
     const [nullifierLocal, secretLocal] = decodeNote(secretBase64);
-    if (!nullifierLocal || !secretLocal) {
-      setError("Provided secret is not valid");
-      setRedeemLoading(false);
-      return;
-    }
+    // if (!nullifierLocal || !secretLocal) {
+    //   setError("Provided secret is not valid");
+    //   setRedeemLoading(false);
+    //   return;
+    // }
 
     setNullifier(nullifierLocal.toString());
     setSecret(secretLocal.toString());
@@ -78,6 +78,9 @@ export default function Redeem() {
   }, [secretBase64, events, hasher]);
 
   const redeem = async () => {
+    console.log("the nullifier", nullifier);
+    console.log("the secret", secret);
+    if(nullifier !== undefined && secret !== undefined){
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
     const ZKPayLink = new ethers.Contract(constants.polygonMumbai.ZKPayLink , CONTRACT_TO_ABI["ZKPayLink"], provider.getSigner(0));
     const ZKPayToken = new ethers.Contract(constants.polygonMumbai.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
@@ -85,6 +88,7 @@ export default function Redeem() {
 
 
     setRedeemLoading(true);
+
     const commitment = hasher.hash(BigNumber.from(nullifier), BigNumber.from(secret)).toString();
 
     const tree = new MerkleTree(10, [], {
@@ -97,6 +101,7 @@ export default function Redeem() {
 
     const address = await provider?.getSigner(0).getAddress() as string;
     const root = merkleProof.pathRoot.toString();
+    
     const proof = await generateProof({
       recipient: BigNumber.from(address).toString(),
       root: root,
@@ -109,21 +114,29 @@ export default function Redeem() {
     const pathAsNumber = [...merkleProof.pathIndices]
       .reverse()
       .reduce((previousValue, currentValue) => previousValue * 2 + currentValue, 0);
+
+
     const nullifierHash = hasher.hash(BigNumber.from(nullifier), BigNumber.from(pathAsNumber)).toString();
 
-    const transaction = await ZKPayLink.withdraw(proof.a, proof.b, proof.c, nullifierHash, address, root);
+    const transaction = await ZKPayLink.withdraw((proof as any).a, (proof as any).b, (proof as any).c, nullifierHash, address, root);
     await transaction.wait(1);
 
     console.log(transaction);
     setRedeemLoading(false);
     setRedeemed(true);
   }
-
+  }
   const onSecretChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
+    console.log("vlaue in browser", e.target.value);
     setSecretBase64(e.target.value);
   }
   return <div>
+    <TextField
+        id="outlined-name"
+        onChange={onSecretChange}
+      />
+   
      {status === "initializing" && (
         <div>Synchronisation with MetaMask ongoing...</div>
       )}
@@ -138,9 +151,7 @@ export default function Redeem() {
         </div>
 
       )}
-       <Button
-          onClick={redeem}
-        >
+       <Button onClick={redeem}>
           {redeemed ? "Already Redemmed" : "Redeem"}
         </Button>
   </div>;

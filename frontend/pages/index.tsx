@@ -4,6 +4,7 @@ import { useMetaMask } from "metamask-react";
 
 export default function Buttons() {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
+  console.log(status);
   console.log("ethereum", ethereum);
   return (
     <div>

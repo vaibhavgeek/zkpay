@@ -84,7 +84,6 @@ contract MerkleTree {
         return false;
     }
 
-    // poseidon(keccak256("easy-links") % FIELD_SIZE)
     function zeros(uint256 i) public pure returns (uint256) {
         if (i == 0)
             return
