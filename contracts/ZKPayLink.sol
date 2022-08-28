@@ -16,12 +16,7 @@ contract ZKPayLink is MerkleTree, ReentrancyGuard {
     mapping(uint256 => bool) public commitments;
     mapping(uint256 => bool) public spentNullifiers;
 
-    event Deposit(
-        bytes32 _address,
-        bytes Note,
-        uint256 commitment,
-        uint32 index
-    );
+    event Deposit(uint256 commitment, uint32 index);
     event Withdrawl(address to, uint256 nullifier);
 
     constructor(
@@ -36,11 +31,7 @@ contract ZKPayLink is MerkleTree, ReentrancyGuard {
         verifier = _verifier;
     }
 
-    function deposit(
-        bytes32 _address,
-        bytes calldata Note,
-        uint256 commitment
-    ) external payable nonReentrant {
+    function deposit(uint256 commitment) external payable nonReentrant {
         require(!commitments[commitment], "ZKPay: Commitment already exist");
 
         IERC20(token).transferFrom(msg.sender, address(this), amount);
@@ -48,7 +39,7 @@ contract ZKPayLink is MerkleTree, ReentrancyGuard {
         uint32 index = insert(commitment);
         commitments[commitment] = true;
 
-        emit Deposit(_address, Note, commitment, index);
+        emit Deposit(commitment, index);
     }
 
     function withdraw(

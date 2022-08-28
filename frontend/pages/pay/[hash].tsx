@@ -7,13 +7,14 @@ import { useContext, useEffect, useState } from "react";
 import {constants} from "../utils/address";
 import { CONTRACT_TO_ABI } from "../utils/contracts";
 import Button from "@mui/material/Button";
+import {randomBN} from "../utils/random";
+import base64url from "base64url";
 
 const Pay = () => {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const [walletConnected, setWalletConnected] = useState<boolean>();
   const router = useRouter();
   const { hash } = router.query;
-
   const [approveLoading, setApproveLoading] = useState<boolean>();
   const [tokenApproved, setTokenApproved] = useState<boolean>();
 
@@ -76,12 +77,18 @@ const Pay = () => {
     const ZKPayToken = new ethers.Contract(constants.auroraDev.ZKPayToken, CONTRACT_TO_ABI["ZKPayToken"] ,  provider.getSigner(0));
   
     setPayLoading(true);
-    try {
-      const transaction = await ZKPayLink.deposit(hash);
+    // try {
+      // const encryptedNote = randomBN(32).toHexString();
+      // const accountAddress = randomBN(32).toHexString();
+      // console.log(encryptedNote);
+      // console.log(accountAddress);
+     // const bytesAddress = ethers.utils.formatBytes32String(account as any);
+     const rawCommitment = BigNumber.from("0x" + base64url.decode(hash as string));
+      const transaction = await ZKPayLink.deposit(rawCommitment);
       await transaction.wait(1);
-    } finally {
-      setPayLoading(false);
-    }
+    // } finally {
+    //   setPayLoading(false);
+    // }
 
     setPayed(true);
   }
